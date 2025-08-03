@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzWA5ZyZKla_ZOk8vrID7kmPaTQnO2j389bA&s" type="image/svg+xml">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Currency Converter</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* General Body Styling */
+        body {
+            font-family: "Inter", sans-serif;
+            background: linear-gradient(135deg, #e0f2fe 0%, #c5e1ff 100%); /* Softer gradient background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 1.5rem; /* Add some padding for smaller screens */
+        }
+
+        /* Main Container Styling */
+        .container {
+            background-color: #ffffff;
+            padding: 3rem; /* Increased padding */
+            border-radius: 1.5rem; /* More rounded corners */
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15), 0 5px 15px rgba(0, 0, 0, 0.08); /* Enhanced shadow */
+            width: 100%;
+            max-width: 550px; /* Slightly wider max-width */
+            box-sizing: border-box;
+            border: 1px solid #e2e8f0; /* Subtle border */
+        }
+
+        /* Heading Styling */
+        h1 {
+            font-size: 2.5rem; /* Larger heading */
+            font-weight: 800; /* Extra bold */
+            color: #1a202c; /* Darker text for better contrast */
+            text-align: center;
+            margin-bottom: 2.5rem; /* More space below heading */
+            letter-spacing: -0.025em; /* Slightly tighter letter spacing */
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.05); /* Subtle text shadow */
+        }
+
+        /* Input Group Styling */
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 1.75rem; /* Increased margin between groups */
+        }
+
+        .input-group label {
+            margin-bottom: 0.6rem; /* Slightly more space below label */
+            font-weight: 700; /* Bolder labels */
+            color: #2d3748; /* Darker label text */
+            font-size: 1.05rem; /* Slightly larger label font */
+        }
+
+        .input-group input,
+        .input-group select {
+            padding: 0.85rem 1.25rem; /* Increased padding */
+            border: 2px solid #cbd5e0; /* Thicker, more prominent border */
+            border-radius: 0.75rem; /* More rounded input fields */
+            font-size: 1.1rem; /* Larger font inside inputs */
+            color: #2d3748; /* Darker input text */
+            background-color: #f8fafc; /* Slightly off-white background */
+            transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out, background-color 0.3s ease;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22 viewBox%3D%220 0 4 5%22%3E%3Cpath fill%3D%22%234a5568%22 d%3D%22M2 0L0 2h4zm0 5L0 3h4z%22%2F%3E%3C%2Fsvg%3E');
+            background-repeat: no-repeat;
+            background-position: right 1rem center; /* Adjusted arrow position */
+            background-size: 0.7em 0.4em; /* Slightly smaller arrow */
+        }
+
+        .input-group input:focus,
+        .input-group select:focus {
+            outline: none;
+            border-color: #4f46e5; /* Deeper indigo on focus */
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.3); /* More pronounced shadow on focus */
+            background-color: #ffffff; /* White background on focus */
+        }
+
+        /* Result Box Styling */
+        .result-box {
+            background-color: #e0f7fa; /* Lighter blue for result */
+            padding: 1.75rem; /* Increased padding */
+            border-radius: 1rem; /* More rounded corners */
+            border: 2px dashed #81d4fa; /* Blue dashed border */
+            text-align: center;
+            font-size: 1.5rem; /* Larger result font */
+            font-weight: 800; /* Extra bold result */
+            color: #00796b; /* Dark teal for result text */
+            min-height: 70px; /* Taller result box */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            word-break: break-all;
+            margin-top: 2.5rem; /* More space above result box */
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); /* Subtle inner shadow */
+        }
+
+        /* Loading Spinner */
+        .loading-spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #6366f1;
+            border-radius: 50%;
+            width: 30px; /* Larger spinner */
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Error Message Styling */
+        .error-message {
+            color: #ef4444;
+            background-color: #fee2e2;
+            padding: 1rem 1.5rem; /* Increased padding */
+            border-radius: 0.75rem; /* More rounded corners */
+            margin-top: 1.5rem; /* More space above error message */
+            text-align: center;
+            font-weight: 600; /* Bolder error text */
+            border: 1px solid #fca5a5; /* Red border */
+        }
+
+        /* Reverse Button Styling */
+        .reverse-button {
+            background-color: #6366f1; /* Indigo color */
+            color: white;
+            padding: 0.9rem; /* Increased padding for a larger touch target */
+            border-radius: 50%; /* Make it perfectly round */
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out, transform 0.2s ease-out;
+            border: none;
+            display: block;
+            width: 50px; /* Fixed width for round button */
+            height: 50px; /* Fixed height for round button */
+            margin: 1.5rem auto 0; /* Center the button and add top margin */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.25); /* Initial shadow */
+        }
+        .reverse-button:hover {
+            background-color: #4f46e5; /* Darker indigo on hover */
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4); /* More pronounced shadow on hover */
+            transform: translateY(-2px); /* Slight lift effect */
+        }
+        .reverse-button:active {
+            background-color: #4338ca; /* Even darker on active */
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3); /* Smaller shadow on active */
+            transform: translateY(0); /* Reset lift effect */
+        }
+        .reverse-button svg {
+            width: 28px; /* Larger icon */
+            height: 28px;
+            fill: currentColor;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            .container {
+                padding: 2rem;
+                border-radius: 1rem;
+            }
+            h1 {
+                font-size: 2rem;
+                margin-bottom: 2rem;
+            }
+            .input-group label {
+                font-size: 1rem;
+            }
+            .input-group input,
+            .input-group select {
+                padding: 0.75rem 1rem;
+                font-size: 1rem;
+            }
+            .result-box {
+                font-size: 1.2rem;
+                padding: 1.25rem;
+                min-height: 60px;
+            }
+            .reverse-button {
+                width: 45px;
+                height: 45px;
+                padding: 0.7rem;
+            }
+            .reverse-button svg {
+                width: 24px;
+                height: 24px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+    <div class="container">
+        <h1 class="text-3xl font-extrabold text-center text-gray-800 mb-8">Currency Converter</h1>
+
+        <div class="input-group">
+            <label for="amount">Amount:</label>
+            <input type="number" id="amount" value="1" min="0" step="0.01" class="w-full">
+        </div>
+
+        <div class="input-group">
+            <label for="fromCurrency">From Currency:</label>
+            <select id="fromCurrency" class="w-full"></select>
+        </div>
+
+        <div class="input-group">
+            <label for="toCurrency">To Currency:</label>
+            <select id="toCurrency" class="w-full"></select>
+        </div>
+
+        <button id="reverseButton" class="reverse-button" aria-label="Reverse Currencies">
+            <!-- SVG icon for reverse -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M6 16.5l-3.5-3.5 3.5-3.5V9h14v2h-14v-2.5zm14-9l3.5 3.5-3.5 3.5V15h-14v-2h14v2.5z"/>
+            </svg>
+        </button>
+
+        <div class="result-box mt-6" id="result">
+            <div class="loading-spinner hidden" id="loadingSpinner"></div>
+            <span id="convertedAmount">Enter amount and select currencies to convert</span>
+        </div>
+
+        <div class="error-message hidden" id="errorMessage"></div>
+    </div>
+
+    <script>
+        const API_URL = "https://api.coingecko.com/api/v3/exchange_rates";
+        let exchangeRates = {};
+        let currencyList = [];
+
+        const amountInput = document.getElementById('amount');
+        const fromCurrencySelect = document.getElementById('fromCurrency');
+        const toCurrencySelect = document.getElementById('toCurrency');
+        const convertedAmountSpan = document.getElementById('convertedAmount');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const errorMessageDiv = document.getElementById('errorMessage');
+        const reverseButton = document.getElementById('reverseButton');
+
+        // Utility function for exponential backoff
+        async function fetchWithBackoff(url, options = {}, retries = 5, delay = 1000) {
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (!response.ok) {
+                        if (response.status === 429) { // Too Many Requests
+                            console.warn(`Rate limit hit, retrying in ${delay / 1000}s...`);
+                            await new Promise(res => setTimeout(res, delay));
+                            delay *= 2; // Exponential backoff
+                            continue;
+                        }
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return await response.json();
+                } catch (error) {
+                    if (i < retries - 1) {
+                        console.error(`Fetch error: ${error.message}. Retrying in ${delay / 1000}s...`);
+                        await new Promise(res => setTimeout(res, delay));
+                        delay *= 2;
+                    } else {
+                        throw error;
+                    }
+                }
+            }
+            throw new Error('Max retries exceeded');
+        }
+
+        // Function to display error messages
+        function showMessage(element, message, isError = true) {
+            element.textContent = message;
+            element.classList.remove('hidden');
+            if (isError) {
+                element.classList.add('bg-red-100', 'text-red-700');
+                element.classList.remove('bg-gray-100', 'text-gray-800');
+            } else {
+                element.classList.add('bg-gray-100', 'text-gray-800');
+                element.classList.remove('bg-red-100', 'text-red-700');
+            }
+        }
+
+        // Function to hide messages
+        function hideMessage(element) {
+            element.classList.add('hidden');
+        }
+
+        // Function to fetch exchange rates
+        async function fetchExchangeRates() {
+            loadingSpinner.classList.remove('hidden');
+            convertedAmountSpan.classList.add('hidden');
+            hideMessage(errorMessageDiv);
+
+            try {
+                const data = await fetchWithBackoff(API_URL);
+                exchangeRates = data.rates;
+                // Filter out cryptocurrencies, keeping only fiat currencies
+                currencyList = Object.keys(exchangeRates)
+                                    .filter(code => exchangeRates[code].type === 'fiat')
+                                    .sort();
+                populateCurrencyDropdowns();
+                convertCurrency(); // Perform initial conversion
+            } catch (error) {
+                console.error("Failed to fetch exchange rates:", error);
+                showMessage(errorMessageDiv, "Failed to load exchange rates. Please try again later.");
+                convertedAmountSpan.textContent = "Error loading data.";
+                convertedAmountSpan.classList.remove('hidden');
+            } finally {
+                loadingSpinner.classList.add('hidden');
+            }
+        }
+
+        // Function to populate currency dropdowns
+        function populateCurrencyDropdowns() {
+            fromCurrencySelect.innerHTML = '';
+            toCurrencySelect.innerHTML = '';
+
+            currencyList.forEach(currencyCode => {
+                const optionFrom = document.createElement('option');
+                optionFrom.value = currencyCode;
+                optionFrom.textContent = `${currencyCode.toUpperCase()} - ${exchangeRates[currencyCode].name}`;
+                fromCurrencySelect.appendChild(optionFrom);
+
+                const optionTo = document.createElement('option');
+                optionTo.value = currencyCode;
+                optionTo.textContent = `${currencyCode.toUpperCase()} - ${exchangeRates[currencyCode].name}`;
+                toCurrencySelect.appendChild(optionTo);
+            });
+
+            // Set default selections, ensuring they are valid fiat currencies
+            if (currencyList.includes('usd')) {
+                fromCurrencySelect.value = 'usd';
+            } else if (currencyList.length > 0) {
+                fromCurrencySelect.value = currencyList[0];
+            }
+
+            if (currencyList.includes('eur')) {
+                toCurrencySelect.value = 'eur';
+            } else if (currencyList.length > 1) { // Ensure there's a second currency for 'to'
+                toCurrencySelect.value = currencyList[1];
+            } else if (currencyList.length === 1) {
+                toCurrencySelect.value = currencyList[0]; // If only one currency, select it for both
+            }
+        }
+
+        // Function to perform currency conversion
+        function convertCurrency() {
+            hideMessage(errorMessageDiv);
+            const amount = parseFloat(amountInput.value);
+            const fromCurrency = fromCurrencySelect.value;
+            const toCurrency = toCurrencySelect.value;
+
+            if (isNaN(amount) || amount <= 0) {
+                convertedAmountSpan.textContent = "Please enter a valid amount.";
+                convertedAmountSpan.classList.remove('hidden');
+                return;
+            }
+
+            if (!exchangeRates[fromCurrency] || !exchangeRates[toCurrency]) {
+                showMessage(errorMessageDiv, "Selected currency data not available.");
+                convertedAmountSpan.textContent = "Error: Currency not found.";
+                convertedAmountSpan.classList.remove('hidden');
+                return;
+            }
+
+            // CoinGecko API provides rates relative to Bitcoin (BTC)
+            // So, to convert From A to B: (Amount in A / Rate of A to BTC) * Rate of B to BTC
+            // Or, more simply: Amount in A * (Rate of B to BTC / Rate of A to BTC)
+            const fromRate = exchangeRates[fromCurrency].value;
+            const toRate = exchangeRates[toCurrency].value;
+
+            if (fromRate === 0 || toRate === 0) {
+                 showMessage(errorMessageDiv, "Exchange rate for one of the selected currencies is zero, cannot convert.");
+                 convertedAmountSpan.textContent = "Invalid exchange rate.";
+                 convertedAmountSpan.classList.remove('hidden');
+                 return;
+            }
+
+            const convertedValue = (amount / fromRate) * toRate;
+            convertedAmountSpan.textContent = `${convertedValue.toFixed(4)} ${toCurrency.toUpperCase()}`;
+            convertedAmountSpan.classList.remove('hidden');
+        }
+
+        // Function to reverse the selected currencies
+        function reverseCurrencies() {
+            const currentFrom = fromCurrencySelect.value;
+            const currentTo = toCurrencySelect.value;
+            fromCurrencySelect.value = currentTo;
+            toCurrencySelect.value = currentFrom;
+            convertCurrency(); // Re-run conversion after swapping
+        }
+
+        // Event listeners
+        amountInput.addEventListener('input', convertCurrency);
+        fromCurrencySelect.addEventListener('change', convertCurrency);
+        toCurrencySelect.addEventListener('change', convertCurrency);
+        reverseButton.addEventListener('click', reverseCurrencies);
+
+        // Initial fetch of exchange rates when the page loads
+        window.onload = fetchExchangeRates;
+    </script>
+</body>
+</html>
